@@ -421,7 +421,7 @@ struct A_returnStmt_ {
 typedef enum {
     A_nullStmtKind,
     A_varDeclStmtKind,
-    A_assignStmtKind,
+    A_assignStmt0.Kind,
     A_callStmtKind,
     A_ifStmtKind,
     A_whileStmtKind,

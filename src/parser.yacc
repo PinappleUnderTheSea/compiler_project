@@ -34,6 +34,25 @@ extern int  yywrap();
 %token <pos> MUL
 %token <pos> DIV
 %token <pos> SEMICOLON // ;
+%token <pos> COLON // :
+%token <pos> LEFT_PARENTHESIS // (
+%token <pos> RIGHT_PARENTHESIS // )
+%token <pos> LEFT_BRACE // {
+%token <pos> RIGHT_BRACE // }
+%token <pos> LEFT_BRACKET // [
+%token <pos> RIGHT_BRACKET // ]
+%token <pos> EQUAL // =
+%token <pos> ARROW // ->
+%token <pos> DOT // .
+%token <pos> COMMA // ,
+%token <pos> AND // &&
+%token <pos> OR // ||
+%token <pos> NOT // !
+%token <pos> LESS // <
+%token <pos> GREATER // >
+%token <pos> LESS_EQUAL // <=
+%token <pos> GREATER_EQUAL // >=
+%token <pos> IS // ==
 
 %type <program> Program
 %type <arithExpr> ArithExpr
