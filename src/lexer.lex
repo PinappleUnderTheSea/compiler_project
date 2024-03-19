@@ -41,9 +41,10 @@ extern "C" { void yyerror(char*); }
 }
 
 [_a-zA-Z][_a-zA-Z0-9]*    { 
-    char * temp = (char *)malloc(strlen(yytext) + 1); 
-    strcpy(temp, yytext); 
-    yylval.tokenId = A_TokenId(A_Pos(line, col), temp); 
+    char * val = (char *)malloc(yyleng + 1); 
+    memset(val, 0, yyleng + 1);
+    strcpy(val, yytext); 
+    yylval.tokenId = A_TokenId(A_Pos(line, col), val); 
     return ID; 
 }
 "int"                   { return INT; }

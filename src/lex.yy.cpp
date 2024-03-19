@@ -885,161 +885,162 @@ case 17:
 YY_RULE_SETUP
 #line 43 "lexer.lex"
 { 
-    char * temp = (char *)malloc(strlen(yytext) + 1); 
-    strcpy(temp, yytext); 
-    yylval.tokenId = A_TokenId(A_Pos(line, col), temp); 
+    char * val = (char *)malloc(yyleng + 1); 
+    memset(val, 0, yyleng + 1);
+    strcpy(val, yytext); 
+    yylval.tokenId = A_TokenId(A_Pos(line, col), val); 
     return ID; 
 }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 49 "lexer.lex"
+#line 50 "lexer.lex"
 { return INT; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 50 "lexer.lex"
+#line 51 "lexer.lex"
 { return ADD; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 51 "lexer.lex"
+#line 52 "lexer.lex"
 { return SUB; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 52 "lexer.lex"
+#line 53 "lexer.lex"
 { return MUL; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 53 "lexer.lex"
+#line 54 "lexer.lex"
 { return DIV; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 54 "lexer.lex"
+#line 55 "lexer.lex"
 { return SEMICOLON; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 55 "lexer.lex"
+#line 56 "lexer.lex"
 { return COLON; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 56 "lexer.lex"
+#line 57 "lexer.lex"
 { return LEFT_SQUARE_BRACKET; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 57 "lexer.lex"
+#line 58 "lexer.lex"
 { return RIGHT_SQUARE_BRACKET; }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 58 "lexer.lex"
+#line 59 "lexer.lex"
 { return EQUAL; }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 59 "lexer.lex"
+#line 60 "lexer.lex"
 { return OPEN_BRACE; }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 60 "lexer.lex"
+#line 61 "lexer.lex"
 { return CLOSED_BRACE; }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 61 "lexer.lex"
+#line 62 "lexer.lex"
 { return LEFT_PARENTHESIS; }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 62 "lexer.lex"
+#line 63 "lexer.lex"
 { return RIGHT_PARENTHESIS; }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 63 "lexer.lex"
+#line 64 "lexer.lex"
 { return RIGHT_ARROW; }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 64 "lexer.lex"
+#line 65 "lexer.lex"
 { return DOT; }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 65 "lexer.lex"
+#line 66 "lexer.lex"
 { return COMMA; }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 66 "lexer.lex"
+#line 67 "lexer.lex"
 { return AND; }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 67 "lexer.lex"
+#line 68 "lexer.lex"
 { return OR; }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 68 "lexer.lex"
+#line 69 "lexer.lex"
 { return NOT; }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 69 "lexer.lex"
+#line 70 "lexer.lex"
 { return LESS; }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 70 "lexer.lex"
+#line 71 "lexer.lex"
 { return GREATER; }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 71 "lexer.lex"
+#line 72 "lexer.lex"
 { return LESS_EQUAL; }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 72 "lexer.lex"
+#line 73 "lexer.lex"
 { return GREATER_EQUAL; }
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 73 "lexer.lex"
+#line 74 "lexer.lex"
 { return IS; }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 74 "lexer.lex"
+#line 75 "lexer.lex"
 { return IS_NOT; }
 	YY_BREAK
 case 44:
 /* rule 44 can match eol */
 YY_RULE_SETUP
-#line 76 "lexer.lex"
+#line 77 "lexer.lex"
 { line++; }
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 77 "lexer.lex"
+#line 78 "lexer.lex"
 {
                             yyerror("Unexpected token\n"); 
                         }
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 80 "lexer.lex"
+#line 81 "lexer.lex"
 ECHO;
 	YY_BREAK
-#line 1043 "lex.yy.cpp"
+#line 1044 "lex.yy.cpp"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(COMMENT1):
 case YY_STATE_EOF(COMMENT2):
@@ -2046,7 +2047,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 80 "lexer.lex"
+#line 81 "lexer.lex"
 
 int calc(char *s, int len) {
     int ret = 0;
