@@ -25,19 +25,20 @@ BEGIN COMMENT2;  }
 BEGIN INITIAL;  }
 <COMMENT1>.             {}
 <COMMENT2>.             {}
-"let"                   { return LET; }
-"struct"                { return STRUCT; }
-"fn"                    { return FN; }
-"continue"              { return CONTINUE; }
-"break"                 { return BREAK; }
-"ret"                   { return RETURN; }
-"while"                 { return WHILE; }
-"if"                    { return IF; }
-"else"                  { return ELSE; }
+"let"                   {  yylval.pos = A_Pos(line, col);col+=yyleng;return LET; }
+"struct"                {  yylval.pos = A_Pos(line, col);col+=yyleng;return STRUCT; }
+"fn"                    {  yylval.pos = A_Pos(line, col);col+=yyleng;return FN; }
+"continue"              {  yylval.pos = A_Pos(line, col);col+=yyleng;return CONTINUE; }
+"break"                 {  yylval.pos = A_Pos(line, col);col+=yyleng;return BREAK; }
+"ret"                   {  yylval.pos = A_Pos(line, col);col+=yyleng;return RETURN; }
+"while"                 {  yylval.pos = A_Pos(line, col);col+=yyleng;return WHILE; }
+"if"                    {  yylval.pos = A_Pos(line, col);col+=yyleng;return IF; }
+"else"                  {  yylval.pos = A_Pos(line, col);col+=yyleng;return ELSE; }
+"int"                   {  yylval.pos = A_Pos(line, col);col+=yyleng;return INT; }
 
 [1-9][0-9]*|0 {
     yylval.tokenNum = A_TokenNum(A_Pos(line, col), calc(yytext, yyleng));
-    return NUM;
+    col+=yyleng;return NUM;
 }
 
 [_a-zA-Z][_a-zA-Z0-9]*    {
@@ -45,38 +46,40 @@ BEGIN INITIAL;  }
     memset(val, 0, yyleng + 1);
     strcpy(val, yytext);
     yylval.tokenId = A_TokenId(A_Pos(line, col), val);
-    return ID;
+    col+=yyleng;return ID;
 }
-"int"                   { return INT; }
-"+"	                    { return ADD; }
-"-"	                    { return SUB; }
-"*"                     { return MUL; }
-"/"                     { return DIV; }
-";"                     { return SEMICOLON; }
-":"                     { return COLON; }
-"["                     { return LEFT_SQUARE_BRACKET; }
-"]"                     { return RIGHT_SQUARE_BRACKET; }
-"="                     { return EQUAL; }
-"{"                     { return OPEN_BRACE; }
-"}"                     { return CLOSED_BRACE; }
-"("                     { return LEFT_PARENTHESIS; }
-")"                     { return RIGHT_PARENTHESIS; }
-"->"	                { return RIGHT_ARROW; }
-"."                     { return DOT; }
-","                     { return COMMA; }
-"&&"                    { return AND; }
-"||"                    { return OR; }
-"!"                     { return NOT; }
-"<"                     { return LESS; }
-">"                     { return GREATER; }
-"<="                    { return LESS_EQUAL; }
-">="                    { return GREATER_EQUAL; }
-"=="                    { return IS; }
-"!="                    { return IS_NOT; }
+"+"	                    {  yylval.pos = A_Pos(line, col);col+=yyleng;return ADD; }
+"-"	                    {  yylval.pos = A_Pos(line, col);col+=yyleng;return SUB; }
+"*"                     {  yylval.pos = A_Pos(line, col);col+=yyleng;return MUL; }
+"/"                     {  yylval.pos = A_Pos(line, col);col+=yyleng;return DIV; }
+";"                     {  yylval.pos = A_Pos(line, col);col+=yyleng;return SEMICOLON; }
+":"                     {  yylval.pos = A_Pos(line, col);col+=yyleng;return COLON; }
+"["                     {  yylval.pos = A_Pos(line, col);col+=yyleng;return LEFT_SQUARE_BRACKET; }
+"]"                     {  yylval.pos = A_Pos(line, col);col+=yyleng;return RIGHT_SQUARE_BRACKET; }
+"="                     {  yylval.pos = A_Pos(line, col);col+=yyleng;return EQUAL; }
+"{"                     {  yylval.pos = A_Pos(line, col);col+=yyleng;return OPEN_BRACE; }
+"}"                     {  yylval.pos = A_Pos(line, col);col+=yyleng;return CLOSED_BRACE; }
+"("                     {  yylval.pos = A_Pos(line, col);col+=yyleng;return LEFT_PARENTHESIS; }
+")"                     {  yylval.pos = A_Pos(line, col);col+=yyleng;return RIGHT_PARENTHESIS; }
+"->"	                {  yylval.pos = A_Pos(line, col);col+=yyleng;return RIGHT_ARROW; }
+"."                     {  yylval.pos = A_Pos(line, col);col+=yyleng;return DOT; }
+","                     {  yylval.pos = A_Pos(line, col);col+=yyleng;return COMMA; }
+"&&"                    {  yylval.pos = A_Pos(line, col);col+=yyleng;return AND; }
+"||"                    {  yylval.pos = A_Pos(line, col);col+=yyleng;return OR; }
+"!"                     {  yylval.pos = A_Pos(line, col);col+=yyleng;return NOT; }
+"<"                     {  yylval.pos = A_Pos(line, col);col+=yyleng;return LESS; }
+">"                     {  yylval.pos = A_Pos(line, col);col+=yyleng;return GREATER; }
+"<="                    {  yylval.pos = A_Pos(line, col);col+=yyleng;return LESS_EQUAL; }
+">="                    {  yylval.pos = A_Pos(line, col);col+=yyleng;return GREATER_EQUAL; }
+"=="                    {  yylval.pos = A_Pos(line, col);col+=yyleng;return IS; }
+"!="                    {  yylval.pos = A_Pos(line, col);col+=yyleng;return IS_NOT; }
 
-[ \t\n\r]                 { line++; }
+\n                 { line++;col=1; }
+\t { col+=4;}
+\r {col=1; }
+[ ] { col++;}
 .	                    {
-yyerror("Unexpected token\n");
+    yyerror("Unexpected token\n");
 }
 %%
 int calc(char *s, int len) {

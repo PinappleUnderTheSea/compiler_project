@@ -113,7 +113,7 @@ void check_Prog(std::ostream& out, aA_program p)
     for (auto ele : p->programElements)
     {
         if(ele->kind == A_programVarDeclStmtKind){
-            check_VarDecl(out, ele->u.varDeclStmt);
+            check_VarDecl(out, ele->u.varDeclStmt, ArithExprEnv::GLOBAL);
         }else if (ele->kind == A_programStructDefKind){
             check_StructDef(out, ele->u.structDef);
         }
@@ -142,23 +142,31 @@ void check_Prog(std::ostream& out, aA_program p)
 }
 
 
-void check_VarDecl(std::ostream& out, aA_varDeclStmt vd)
+void check_VarDecl(std::ostream& out, aA_varDeclStmt vd, ArithExprEnv env)
 {
     if (!vd)
         return;
     string name;
+
     if (vd->kind == A_varDeclStmtType::A_varDeclKind){
         // decl only
         aA_varDecl vdecl = vd->u.varDecl;
         if(vdecl->kind == A_varDeclType::A_varDeclScalarKind){
             name = *vdecl->u.declScalar->id;
             /* fill code here*/
+            if(env == ArithExprEnv::GLOBAL){
+                // std::cerr << "global name :" << name << std::endl;
+            }
             if (utils_isExist(name)){
-                Error::Redefinition(vd->pos, name);
+                Error::Redefinition(vd->u.varDecl->u.declScalar->pos, name);
             }
             aA_type type = vd->u.varDecl->u.declScalar->type;
+            // std::cerr << name << " type= " << type->type << std::endl;
             if (type && !utils_TypeValid(type)){
                 Error::UnknowType(type->pos, *type->u.structType);
+            }
+            if(env == ArithExprEnv::GLOBAL){
+                runtime_token.insert({name, std::pair<tc_type, ValueInfo>(tc_Type(type, 0), ValueInfo(Check_Scalar, 0))});
             }
         }else if (vdecl->kind == A_varDeclType::A_varDeclArrayKind){
             name = *vdecl->u.declArray->id;
@@ -175,6 +183,9 @@ void check_VarDecl(std::ostream& out, aA_varDeclStmt vd)
             if (type && !utils_TypeValid(type)){
                 Error::UnknowType(type->pos, *type->u.structType);
             }
+            if(env == ArithExprEnv::GLOBAL){
+                runtime_token.insert({name, std::pair<tc_type, ValueInfo>(tc_Type(type, 1), ValueInfo(Check_Array, len))});
+            }
         }
     }
     else if (vd->kind == A_varDeclStmtType::A_varDefKind){
@@ -187,13 +198,17 @@ void check_VarDecl(std::ostream& out, aA_varDeclStmt vd)
                 Error::Redefinition(vd->pos, name);
             }
             // Type Valid
-            aA_type type = vd->u.varDef->u.defScalar->type;
+            aA_type type = vdef->u.defScalar->type;
+            // std::cerr << name << " type = "<< type->type << " typename: " << *type->u.structType <<  std::endl;
             if (type && !utils_TypeValid(type)){
                 Error::UnknowType(type->pos, *type->u.structType);
             }
             // RightValue Invariant
             aA_rightVal rightVal = vd->u.varDef->u.defScalar->val;
             check_RightValue(out, rightVal, type, ArithExprEnv::GLOBAL);
+            if(env == ArithExprEnv::GLOBAL){
+                runtime_token.insert({name, std::pair<tc_type, ValueInfo>(tc_Type(type, 0), ValueInfo(Check_Scalar, 0))});
+            }
 
         }else if (vdef->kind == A_varDefType::A_varDefArrayKind){
             name = *vdef->u.defArray->id;
@@ -218,6 +233,9 @@ void check_VarDecl(std::ostream& out, aA_varDeclStmt vd)
                 Error::ArrayExcessElement(rightVals[len-1]->pos);
             }
             check_RightValueList(out, rightVals, type, ArithExprEnv::GLOBAL);
+            if(env == ArithExprEnv::GLOBAL){
+                runtime_token.insert({name, std::pair<tc_type, ValueInfo>(tc_Type(type, 1), ValueInfo(Check_Array, len))});
+            }
         }
     }
     return;
@@ -286,7 +304,7 @@ void check_FnDecl(std::ostream& out, aA_fnDecl fd)
         auto oldRet = funcStatues.find(name)->second.first;
         auto newRet = fd->type;
         if(!utils_isSameType(oldRet, newRet)){
-            Error::FunctionReturnOverload(fd->pos, name);
+            Error::FunctionReturnOverload(fd->pos, name, oldRet->pos);
         }
 
         // is function params matches decl
@@ -380,21 +398,37 @@ void check_FnDef(std::ostream& out, aA_fnDef fd)
     // should match if declared
     check_FnDecl(out, fd->fnDecl);
     // add params to local tokenmap, func params override global ones
-    runtime_token.clear();
+    // runtime_token.clear();
+    typeMap *scope_token2Type = new typeMap;
+    local_token2Type.push_back(scope_token2Type);
     for (aA_varDecl vd : fd->fnDecl->paramDecl->varDecls)
     {
         /* fill code here */
         if (vd->kind == A_varDeclType::A_varDeclScalarKind){
             aA_varDeclScalar scalar = vd->u.declScalar;
-            runtime_token.insert({*scalar->id, std::pair<tc_type, ValueInfo>(tc_Type(scalar->type, 0), ValueInfo(Check_ValType::Check_Scalar, 0))});
+            string valName = *vd->u.declScalar->id;
+            if(runtime_token.find(valName) != runtime_token.end()){
+                // std::cerr << "conflict name :" << valName<<" new type:"<< (scalar->type->type) << " global count = " << (runtime_token.size())<< std::endl;
+                scope_token2Type->insert({valName, runtime_token.find(valName)->second});
+                runtime_token.erase(runtime_token.find(valName));
+            }
+            runtime_token.insert({valName, std::pair<tc_type, ValueInfo>(tc_Type(scalar->type, 0), ValueInfo(Check_ValType::Check_Scalar, 0))});
+            // std::cerr <<"new type: " <<(runtime_token.find(valName)->second.first->type->type)<< " should be "<< (scalar->type->type) <<std::endl;
+            // std::cerr <<"old type: " <<(scope_token2Type->find(valName)->second.first->type->type);
         }
         if (vd->kind == A_varDeclType::A_varDeclArrayKind){
             aA_varDeclArray array = vd->u.declArray;
+            string valName = *vd->u.declScalar->id;
+            if(runtime_token.find(valName) != runtime_token.end()){
+                scope_token2Type->insert({valName, runtime_token.find(valName)->second});
+                runtime_token.erase(runtime_token.find(valName));
+            }
             runtime_token.insert({*array->id, std::pair<tc_type, ValueInfo>(tc_Type(array->type, 1), ValueInfo(Check_ValType::Check_Array, array->len))});
         }
     }
 
     /* fill code here */
+    std::vector<string> typenames;
     env_return_type = fd->fnDecl->type;
     for (aA_codeBlockStmt stmt : fd->stmts)
     {
@@ -403,12 +437,7 @@ void check_FnDef(std::ostream& out, aA_fnDef fd)
         /* fill code here */
         if (stmt->kind == A_codeBlockStmtType::A_varDeclStmtKind){
             string name = varDecl_InsertRunTime(stmt->u.varDeclStmt);
-            typeMap::const_iterator iter = runtime_token.find(name);
-            if (iter == runtime_token.end()){} 
-            else {
-                string name = iter->first;
-                runtime_token.erase(iter);
-            }
+            typenames.push_back(name);
         }
         if (stmt->u.returnStmt->retVal && !env_return_type){
             Error::FunctionVoidReturn(stmt->u.returnStmt->pos);
@@ -417,7 +446,26 @@ void check_FnDef(std::ostream& out, aA_fnDef fd)
             check_RightValue(out, stmt->u.returnStmt->retVal, env_return_type, ArithExprEnv::CODEBLOCK);
         }
     }
+    for (string name: typenames){
+        typeMap::const_iterator iter = runtime_token.find(name);
+        if (iter == runtime_token.end()){
+        } else {
+            string name = iter->first;
+            runtime_token.erase(iter);
+        }
+    }
 
+    for(auto iter = scope_token2Type->begin(); iter != scope_token2Type->end(); iter++){
+        // std::cerr << "recover name:" <<(iter->first) << " type :" <<(iter->second.first->type->type) << std::endl;
+        if(runtime_token.find(iter->first) != runtime_token.end()){
+            runtime_token.erase(iter->first);
+        }
+        runtime_token.insert({iter->first, iter->second});
+        // std::cerr << "recover ans name:" <<(iter->first) << " type :" <<((runtime_token.find(iter->first))->second.first->type->type) << std::endl;
+
+    }
+    local_token2Type.erase(local_token2Type.end()-1);
+    delete scope_token2Type;
     return;
 }
 
@@ -429,7 +477,7 @@ void check_CodeblockStmt(std::ostream& out, aA_codeBlockStmt cs){
     switch (cs->kind)
     {
     case A_codeBlockStmtType::A_varDeclStmtKind:
-        check_VarDecl(out, cs->u.varDeclStmt);
+        check_VarDecl(out, cs->u.varDeclStmt, ArithExprEnv::CODEBLOCK);
         break;
     case A_codeBlockStmtType::A_assignStmtKind:
         check_AssignStmt(out, cs->u.assignStmt);
@@ -458,6 +506,7 @@ void check_AssignStmt(std::ostream& out, aA_assignStmt as){
         return;
     string name;
     tc_type deduced_type; // deduced type if type is omitted at decl
+    // std::cerr<<name<<" type is " << as->leftVal->kind<<std::endl;
     switch (as->leftVal->kind)
     {
         case A_leftValType::A_varValKind:{
@@ -531,8 +580,8 @@ void check_ArrayExpr(std::ostream& out, aA_arrayExpr ae){
 }
 
  
-tc_type check_MemberExpr(std::ostream& out, aA_memberExpr me){
     // check if the member exists and return the tyep of the member
+tc_type check_MemberExpr(std::ostream& out, aA_memberExpr me){
     if(!me)
         return nullptr;
     string name = *me->structId->u.id;

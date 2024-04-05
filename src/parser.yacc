@@ -364,9 +364,9 @@ $$ = NULL;
 ;
 
 FnDeclStmt: FnDecl SEMICOLON
-        {
-                $$ = A_FnDeclStmt($1->pos, $1);
-        }
+{
+$$ = A_FnDeclStmt($1->pos, $1);
+}
 ;
 FnDecl: FN ID LEFT_PARENTHESIS ParamDecl RIGHT_PARENTHESIS
 {

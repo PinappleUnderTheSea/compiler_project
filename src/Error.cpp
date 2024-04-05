@@ -90,9 +90,9 @@ void Error::FunctionArgsSize(A_pos p, int require, int provided){
     error_print(&std::cout, p, msg);
 }
 
-void Error::FunctionReturnOverload(A_pos p, string name){
+void Error::FunctionReturnOverload(A_pos p, string name, A_pos old){
     char msg[BUFFER_SIZE] = { 0 };
-    snprintf(msg, sizeof(msg)-1, " '%s' functions that differ only in their return type cannot be overloaded", name.c_str());
+    snprintf(msg, sizeof(msg)-1, " function definition on line %d doesn't match the declaration on line %d", p->line, old->line);
     error_print(&std::cout, p, msg);
 }
 

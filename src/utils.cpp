@@ -41,16 +41,6 @@ string utils_GetTypeString(aA_type type) {
 }
 
 bool utils_isExist(string id) {
-    if (STRICT_DEFINITON) {
-        paramMemberMap::const_iterator iter = struct2Members.find(id);
-        if (iter != struct2Members.end()){
-            return false;
-        }
-        iter = func2Param.find(id);
-        if (iter != func2Param.end()){
-            return false;
-        }
-    }
     typeMap::const_iterator iter = runtime_token.find(id);
     if (iter == runtime_token.end()){
         iter = g_token2Type.find(id);
@@ -188,6 +178,7 @@ bool utils_TypeValid(aA_type type){
     if (type->type == A_dataType::A_structTypeKind && utils_isStructToken(*type->u.structType)){
         return true;
     }
+    std::cerr << "detail type: " << type->type << std::endl;
     return false;
 }
 

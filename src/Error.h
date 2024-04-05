@@ -28,7 +28,7 @@ public:
     static void StructNotStruct(A_pos p, string id, string type);
 
     static void FunctionArgsSize(A_pos p, int require, int provided);
-    static void FunctionReturnOverload(A_pos p, string name);
+    static void FunctionReturnOverload(A_pos p, string name, A_pos old);
     static void FunctionReturnType(A_pos p, string should, string but);
     static void FunctionVoidReturn(A_pos p);
     

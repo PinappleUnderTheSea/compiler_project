@@ -1593,9 +1593,9 @@ root = A_Program((yyvsp[0].programElementList));
 
   case 44: /* FnDeclStmt: FnDecl SEMICOLON  */
 #line 367 "parser.yacc"
-        {
-                (yyval.fnDeclStmt) = A_FnDeclStmt((yyvsp[-1].fnDecl)->pos, (yyvsp[-1].fnDecl));
-        }
+{
+(yyval.fnDeclStmt) = A_FnDeclStmt((yyvsp[-1].fnDecl)->pos, (yyvsp[-1].fnDecl));
+}
 #line 1600 "y.tab.cpp"
     break;
 

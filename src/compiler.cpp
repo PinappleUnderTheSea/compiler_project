@@ -14,7 +14,7 @@ extern int yyparse();
 extern YYSTYPE yylval;
 extern int yydebug;
 
-int line, col;
+int line=1, col=1;
 
 A_program root;
 aA_program aroot;
