@@ -12,7 +12,7 @@ run: $(patsubst $(TESTCASE_DIR)/%.tea,$(TESTCASE_DIR)/%.ast,$(TESTCASES))
 $(TESTCASE_DIR)/%.ast: $(TESTCASE_DIR)/%.tea compiler
 	@./compiler $< $@
 
-compiler: y.tab.o lex.yy.o TypeCheck.o TeaplAst.o TeaplaAst.o PrintTeaplaAst.o compiler.o 
+compiler: y.tab.o lex.yy.o TypeCheck.o TeaplAst.o TeaplaAst.o PrintTeaplaAst.o compiler.o utils.o Error.o
 	$(CXX) $(CXXFLAGS) -o compiler $^ 
 
 y.tab.cpp: parser.yacc TeaplAst.h 
@@ -33,6 +33,12 @@ lex.yy.o: lex.yy.cpp y.tab.hpp
 	$(CXX) $(CXXFLAGS) -c $<
 
 TypeCheck.o: TypeCheck.cpp TypeCheck.h
+	$(CXX) $(CXXFLAGS) -c $<
+
+utils.o: utils.cpp utils.h
+	$(CXX) $(CXXFLAGS) -c $<
+
+Error.o: Error.cpp Error.h
 	$(CXX) $(CXXFLAGS) -c $<
 
 TeaplAst.o: TeaplAst.cpp TeaplAst.h
