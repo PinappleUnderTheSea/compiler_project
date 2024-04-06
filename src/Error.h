@@ -38,7 +38,6 @@ public:
     static void t_StructArrayMember(A_pos p, string name);
     static void t_BoolExprNotAllowed(A_pos p);
 
-    static void strict_FunctionParamsName(A_pos p, string new_name, string old_name);
 };
 
 #endif

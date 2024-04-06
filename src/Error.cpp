@@ -8,7 +8,7 @@ void error_print(std::ostream* out, A_pos p, string info)
 
 void Error::Redefinition(A_pos p, string name) {
     char msg[BUFFER_SIZE] = { 0 };
-    snprintf(msg, sizeof(msg)-1, "redefinition of '%s'", name.c_str());
+    snprintf(msg, sizeof(msg)-1, "var '%s' is already defined", name.c_str());
     error_print(&std::cout, p, msg);
 }
 
@@ -32,7 +32,7 @@ void Error::NoViableConversion(A_pos p, string from, string to) {
 
 void Error::UseOfUndeclaredId(A_pos p, string name) {
     char msg[BUFFER_SIZE] = { 0 };
-    snprintf(msg, sizeof(msg)-1, "use of undeclared identifier '%s'", name.c_str());
+    snprintf(msg, sizeof(msg)-1, "var %s on line %d, col %d is not defined", name.c_str(), p->line, p->col);
     error_print(&std::cout, p, msg);
 }
 
@@ -44,7 +44,7 @@ void Error::DeducedTypeInitializer(A_pos p, string name) {
 
 void Error::BinaryExpressionInvalidOperand(A_pos p, string x, string y) {
     char msg[BUFFER_SIZE] = { 0 };
-    snprintf(msg, sizeof(msg)-1, "invalid operands to binary expression ('%s' and '%s')", x.c_str(), y.c_str());
+    snprintf(msg, sizeof(msg)-1, "'%s' is not comparable with '%s')", x.c_str(), y.c_str());
     error_print(&std::cout, p, msg);
 }
 
@@ -80,7 +80,7 @@ void Error::StructNoMember(A_pos p, string member, string structName){
 
 void Error::StructNotStruct(A_pos p, string id, string type){
     char msg[BUFFER_SIZE] = { 0 };
-    snprintf(msg, sizeof(msg)-1, "'%s' member reference base type '%s' is not a structure or union", id.c_str(), type.c_str());
+    snprintf(msg, sizeof(msg)-1, "'%s'(type: '%s') is not a struct", id.c_str(), type.c_str());
     error_print(&std::cout, p, msg);
 }
 
@@ -98,7 +98,7 @@ void Error::FunctionReturnOverload(A_pos p, string name, A_pos old){
 
 void Error::FunctionReturnType(A_pos p, string should, string but){
     char msg[BUFFER_SIZE] = { 0 };
-    snprintf(msg, sizeof(msg)-1, " cannot initialize return object of type '%s' with an lvalue of type '%s'", should.c_str(), but.c_str());
+    snprintf(msg, sizeof(msg)-1, " cannot initialize return object of type '%s' with an left value of type '%s'", should.c_str(), but.c_str());
     error_print(&std::cout, p, msg);
 }
 
@@ -110,36 +110,26 @@ void Error::FunctionVoidReturn(A_pos p){
 
 void Error::t_ArrayIdInArithExpr(A_pos p){
     char msg[BUFFER_SIZE] = { 0 };
-    snprintf(msg, sizeof(msg)-1, "[temp] array id not available in arithmetic expression");
-    error_print(&std::cout, p, msg);
-}
-
-void Error::t_OtherTypeInArithExpr(A_pos p){
-    char msg[BUFFER_SIZE] = { 0 };
-    snprintf(msg, sizeof(msg)-1, "[temp] types exclude INT not available in binary arithmetic expression");
+    snprintf(msg, sizeof(msg)-1, "array id not available in arithmetic expression");
     error_print(&std::cout, p, msg);
 }
 
 void Error::t_OverrideFunc(A_pos p, string name){
     char msg[BUFFER_SIZE] = { 0 };
-    snprintf(msg, sizeof(msg)-1, "[temp] '%s' override or redefinition not available", name.c_str());
+    snprintf(msg, sizeof(msg)-1, "'%s' override or redefinition not available", name.c_str());
     error_print(&std::cout, p, msg);
 }
 
 void Error::t_StructArrayMember(A_pos p, string name){
     char msg[BUFFER_SIZE] = { 0 };
-    snprintf(msg, sizeof(msg)-1, "[temp] array member '%s' expression not available", name.c_str());
+    snprintf(msg, sizeof(msg)-1, "array member '%s' expression not available", name.c_str());
     error_print(&std::cout, p, msg);
 }
 
 void Error::t_BoolExprNotAllowed(A_pos p){
     char msg[BUFFER_SIZE] = { 0 };
-    snprintf(msg, sizeof(msg)-1, "[temp] bool expression only available for int");
+    snprintf(msg, sizeof(msg)-1, "bool expression only available for int");
     error_print(&std::cout, p, msg);
 }
 
-void Error::strict_FunctionParamsName(A_pos p, string new_name, string old_name){
-    char msg[BUFFER_SIZE] = { 0 };
-    snprintf(msg, sizeof(msg)-1, "[strict] function parameters name '%s' differs from '%s'", new_name.c_str(), old_name.c_str());
-    error_print(&std::cout, p, msg);
-}
+
