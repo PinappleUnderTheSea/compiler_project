@@ -6,7 +6,6 @@
 #include <algorithm>
 #include <unordered_map>
 #include <string.h>
-#include <vector>
 #include "Error.h"
 #include "TeaplAst.h"
 #include "TeaplaAst.h"
@@ -60,21 +59,20 @@ extern bool STRICT_FUNCTION_DEFINITON;
 extern aA_type env_return_type;
 
 
-aA_type utils_GetTypeFromId(string id);
-string utils_GetTypeString(aA_type type);
-bool utils_isExist(string id);
-bool utils_isType(string id, aA_type type);
-bool utils_isStruct(string id);
-bool utils_isStruct(string id, string name);
-bool utils_isArray(string id);
-bool utils_isArray(string structId, string memberId);
-aA_type utils_GetNativeTypeInstance(A_nativeType data_type);
-bool utils_isStructToken(string token);
-aA_type utils_isInStruct(string memberId, string structName);
-bool utils_TypeValid(aA_type type);
-bool utils_isSameType(aA_type x, aA_type y);
-int utils_getSizeFromArrayId(string id);
-aA_type utils_getReturnTypeByName(string name);
+aA_type GetTypeFromId(string id);
+string GetTypeString(aA_type type);
+bool isExist(string id);
+bool isStruct(string id);
+bool isStruct(string id, string name);
+bool isArray(string id);
+bool isArray(string structId, string memberId);
+aA_type GetNativeTypeInstance(A_nativeType data_type);
+bool isStructToken(string token);
+aA_type isInStruct(string memberId, string structName);
+bool TypeValid(aA_type type);
+bool isSameType(aA_type x, aA_type y);
+int getSizeFromArrayId(string id);
+aA_type getReturnTypeByName(string name);
 
 aA_type check_ArrayExpr(std::ostream* out, aA_arrayExpr ae);
 aA_type check_MemberExpr(std::ostream* out, aA_memberExpr me);

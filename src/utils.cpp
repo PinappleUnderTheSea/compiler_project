@@ -15,7 +15,7 @@ bool STRICT_DEFINITON = true;
 bool STRICT_FUNCTION_DEFINITON = true;
 aA_type env_return_type;
 
-aA_type utils_GetTypeFromId(string id) {
+aA_type GetTypeFromId(string id) {
     typeMap::const_iterator iter = runtime_token.find(id);
     if (iter == runtime_token.end()){
         iter = g_token2Type.find(id);
@@ -27,7 +27,7 @@ aA_type utils_GetTypeFromId(string id) {
     return iter->second.first->type;
 }
 
-string utils_GetTypeString(aA_type type) {
+string GetTypeString(aA_type type) {
     if (!type) return "auto";
     string type_name = "";
     if (type->type == A_dataType::A_nativeTypeKind){
@@ -40,7 +40,7 @@ string utils_GetTypeString(aA_type type) {
     return type_name;
 }
 
-bool utils_isExist(string id) {
+bool isExist(string id) {
     typeMap::const_iterator iter = runtime_token.find(id);
     if (iter == runtime_token.end()){
         iter = g_token2Type.find(id);
@@ -52,27 +52,7 @@ bool utils_isExist(string id) {
     return true;
 }
 
-bool utils_isType(string id, aA_type type) {
-    if (type->type == A_dataType::A_structTypeKind) {
-        std::cout << "Utils: utils_isType do not support struct type." << std::endl;
-        exit(0);
-    }
-    typeMap::const_iterator iter = runtime_token.find(id);
-    if (iter == runtime_token.end()){
-        iter = g_token2Type.find(id);
-        if (iter == g_token2Type.end()) {
-            return false;
-        }
-    }
-    aA_type id_type = iter->second.first->type;
-    if (!id_type) return false;
-    if (id_type->type == type->type && id_type->u.nativeType == type->u.nativeType){
-        return true;
-    }
-    return false;
-}
-
-bool utils_isStruct(string id) {
+bool isStruct(string id) {
     typeMap::const_iterator iter = runtime_token.find(id);
     if (iter == runtime_token.end()){
         iter = g_token2Type.find(id);
@@ -88,7 +68,7 @@ bool utils_isStruct(string id) {
     return false;
 }
 
-bool utils_isStruct(string id, string name) {
+bool isStruct(string id, string name) {
     typeMap::const_iterator iter = runtime_token.find(id);
     if (iter == runtime_token.end()){
         iter = g_token2Type.find(id);
@@ -103,7 +83,7 @@ bool utils_isStruct(string id, string name) {
     return false;
 }
 
-bool utils_isArray(string id) {
+bool isArray(string id) {
     typeMap::const_iterator iter = runtime_token.find(id);
     if (iter == runtime_token.end()){
         iter = g_token2Type.find(id);
@@ -118,8 +98,8 @@ bool utils_isArray(string id) {
     return false;
 }
 
-bool utils_isArray(string structId, string memberId) {
-    string type_name = *utils_GetTypeFromId(structId)->u.structType;
+bool isArray(string structId, string memberId) {
+    string type_name = *GetTypeFromId(structId)->u.structType;
     paramMemberMap::const_iterator iter = struct2Members.find(type_name);
     std::vector<aA_varDecl> members = *iter->second;
     for (aA_varDecl member: members) {
@@ -136,7 +116,7 @@ bool utils_isArray(string structId, string memberId) {
     return false;
 }
 
-aA_type utils_GetNativeTypeInstance(A_nativeType data_type) {
+aA_type GetNativeTypeInstance(A_nativeType data_type) {
     aA_type p = new aA_type_;
     p->pos = nullptr;
     p->type = A_dataType::A_nativeTypeKind;
@@ -144,7 +124,7 @@ aA_type utils_GetNativeTypeInstance(A_nativeType data_type) {
     return p;
 }
 
-bool utils_isStructToken(string token) {
+bool isStructToken(string token) {
     paramMemberMap::const_iterator iter = struct2Members.find(token);
     if (iter == struct2Members.end()){
         return false;
@@ -152,7 +132,7 @@ bool utils_isStructToken(string token) {
     return true;
 }
 
-aA_type utils_isInStruct(string memberId, string structName) {
+aA_type isInStruct(string memberId, string structName) {
     paramMemberMap::const_iterator iter = struct2Members.find(structName);
     if (iter == struct2Members.end()){
         return nullptr;
@@ -171,18 +151,18 @@ aA_type utils_isInStruct(string memberId, string structName) {
     return nullptr;
 }
 
-bool utils_TypeValid(aA_type type){
+bool TypeValid(aA_type type){
     if (type->type == A_dataType::A_nativeTypeKind){
         return true;
     }
-    if (type->type == A_dataType::A_structTypeKind && utils_isStructToken(*type->u.structType)){
+    if (type->type == A_dataType::A_structTypeKind && isStructToken(*type->u.structType)){
         return true;
     }
     std::cerr << "detail type: " << type->type << std::endl;
     return false;
 }
 
-bool utils_isSameType(aA_type x, aA_type y){
+bool isSameType(aA_type x, aA_type y){
     if (x->type != y->type){
         return false;
     }
@@ -195,11 +175,11 @@ bool utils_isSameType(aA_type x, aA_type y){
     return false;
 }
 
-int utils_getSizeFromArrayId(string id){
-    if (!utils_isExist(id)){
+int getSizeFromArrayId(string id){
+    if (!isExist(id)){
         return -1;
     }
-    if (!utils_isArray(id)){
+    if (!isArray(id)){
         return -1;
     }
     typeMap::const_iterator iter = runtime_token.find(id);
@@ -209,7 +189,7 @@ int utils_getSizeFromArrayId(string id){
     return iter->second.second.size;
 }
 
-aA_type utils_getReturnTypeByName(string name) {
+aA_type getReturnTypeByName(string name) {
     std::unordered_map<string, std::pair<aA_type, Function_Status>>::const_iterator iter = funcStatues.find(name);
     if (iter == funcStatues.end()) {
         return nullptr;
@@ -223,15 +203,15 @@ aA_type check_ArrayExpr(std::ostream* out, aA_arrayExpr ae){
 
     string id = *ae->arr->u.id;
     // exist
-    if (!utils_isExist(id)){
+    if (!isExist(id)){
         Error::UseOfUndeclaredId(ae->pos, id);
     }
     // array ?
-    if (!utils_isArray(id)){
+    if (!isArray(id)){
         Error::ArraySubscriptValue(ae->pos, id);
     }
 
-    int size = utils_getSizeFromArrayId(id);
+    int size = getSizeFromArrayId(id);
     int index = 0;
     if (ae->idx->kind == A_indexExprKind::A_numIndexKind){
         index = ae->idx->u.num;
@@ -240,16 +220,16 @@ aA_type check_ArrayExpr(std::ostream* out, aA_arrayExpr ae){
         }
     } else {
         string idexId = *ae->idx->u.id;
-        if (!utils_isExist(idexId)){
+        if (!isExist(idexId)){
             Error::UseOfUndeclaredId(ae->idx->pos, idexId);
         }
-        aA_type idexIdType = utils_GetTypeFromId(idexId);
-        if (!utils_isSameType(idexIdType, utils_GetNativeTypeInstance(A_nativeType::A_intTypeKind))){
-            Error::NoViableConversion(ae->idx->pos, utils_GetTypeString(idexIdType), "int");
+        aA_type idexIdType = GetTypeFromId(idexId);
+        if (!isSameType(idexIdType, GetNativeTypeInstance(A_nativeType::A_intTypeKind))){
+            Error::NoViableConversion(ae->idx->pos, GetTypeString(idexIdType), "int");
         }
     }
     
-    return utils_GetTypeFromId(id);
+    return GetTypeFromId(id);
 }
 
 aA_type check_MemberExpr(std::ostream* out, aA_memberExpr me) {
@@ -262,16 +242,16 @@ aA_type check_MemberExpr(std::ostream* out, aA_memberExpr me) {
     string memberId = *me->memberId;
     string structID = *me->structId->u.id;
 
-    if (!utils_isExist(structID)) {
+    if (!isExist(structID)) {
         Error::UseOfUndeclaredId(me->pos, structID);
     }
-    if (!utils_isStruct(structID)) {
-        Error::StructNotStruct(me->pos, structID, utils_GetTypeString(utils_GetTypeFromId(structID)));
+    if (!isStruct(structID)) {
+        Error::StructNotStruct(me->pos, structID, GetTypeString(GetTypeFromId(structID)));
     }
-    aA_type type = utils_isInStruct(memberId, utils_GetTypeString(utils_GetTypeFromId(structID)));
+    aA_type type = isInStruct(memberId, GetTypeString(GetTypeFromId(structID)));
 
     if (!type) {
-        Error::StructNoMember(me->pos, memberId, utils_GetTypeString(utils_GetTypeFromId(structID)));
+        Error::StructNoMember(me->pos, memberId, GetTypeString(GetTypeFromId(structID)));
     }
 
     return type;

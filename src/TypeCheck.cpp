@@ -157,12 +157,12 @@ void check_VarDecl(std::ostream& out, aA_varDeclStmt vd, ArithExprEnv env)
             if(env == ArithExprEnv::GLOBAL){
                 // std::cerr << "global name :" << name << std::endl;
             }
-            if (utils_isExist(name)){
+            if (isExist(name)){
                 Error::Redefinition(vd->u.varDecl->u.declScalar->pos, name);
             }
             aA_type type = vd->u.varDecl->u.declScalar->type;
             // std::cerr << name << " type= " << type->type << std::endl;
-            if (type && !utils_TypeValid(type)){
+            if (type && !TypeValid(type)){
                 Error::UnknowType(type->pos, *type->u.structType);
             }
             if(env == ArithExprEnv::GLOBAL){
@@ -171,7 +171,7 @@ void check_VarDecl(std::ostream& out, aA_varDeclStmt vd, ArithExprEnv env)
         }else if (vdecl->kind == A_varDeclType::A_varDeclArrayKind){
             name = *vdecl->u.declArray->id;
             /* fill code here*/
-            if (utils_isExist(name)){
+            if (isExist(name)){
                 Error::Redefinition(vd->pos, name);
             }
             int len = vd->u.varDecl->u.declArray->len;
@@ -180,7 +180,7 @@ void check_VarDecl(std::ostream& out, aA_varDeclStmt vd, ArithExprEnv env)
             }
 
             aA_type type = vd->u.varDecl->u.declArray->type;
-            if (type && !utils_TypeValid(type)){
+            if (type && !TypeValid(type)){
                 Error::UnknowType(type->pos, *type->u.structType);
             }
             if(env == ArithExprEnv::GLOBAL){
@@ -194,13 +194,13 @@ void check_VarDecl(std::ostream& out, aA_varDeclStmt vd, ArithExprEnv env)
         if (vdef->kind == A_varDefType::A_varDefScalarKind){
             name = *vdef->u.defScalar->id;
             /* fill code here, allow omited type */
-            if (utils_isExist(name)){
+            if (isExist(name)){
                 Error::Redefinition(vd->pos, name);
             }
             // Type Valid
             aA_type type = vdef->u.defScalar->type;
             // std::cerr << name << " type = "<< type->type << " typename: " << *type->u.structType <<  std::endl;
-            if (type && !utils_TypeValid(type)){
+            if (type && !TypeValid(type)){
                 Error::UnknowType(type->pos, *type->u.structType);
             }
             // RightValue Invariant
@@ -213,12 +213,12 @@ void check_VarDecl(std::ostream& out, aA_varDeclStmt vd, ArithExprEnv env)
         }else if (vdef->kind == A_varDefType::A_varDefArrayKind){
             name = *vdef->u.defArray->id;
             /* fill code here, allow omited type */
-            if (utils_isExist(name)){
+            if (isExist(name)){
                 Error::Redefinition(vd->pos, name);
             }
             // Type Valid
             aA_type type = vd->u.varDef->u.defArray->type;
-            if (type && !utils_TypeValid(type)){
+            if (type && !TypeValid(type)){
                 Error::UnknowType(type->pos, *type->u.structType);
             }
             // Initializer invariant
@@ -266,8 +266,8 @@ void check_paramDecl(std::ostream& out, aA_paramDecl pd){
             }
 
             aA_type type = varDecl->u.declScalar->type;
-            if (type && !utils_TypeValid(type)) {
-                Error::UnknowType(varDecl->pos, utils_GetTypeString(type));
+            if (type && !TypeValid(type)) {
+                Error::UnknowType(varDecl->pos, GetTypeString(type));
             }
         }
         
@@ -280,8 +280,8 @@ void check_paramDecl(std::ostream& out, aA_paramDecl pd){
             }
 
             aA_type type = varDecl->u.declArray->type;
-            if (type && !utils_TypeValid(type)) {
-                Error::UnknowType(varDecl->pos, utils_GetTypeString(type));
+            if (type && !TypeValid(type)) {
+                Error::UnknowType(varDecl->pos, GetTypeString(type));
             }
         }
     } 
@@ -303,7 +303,7 @@ void check_FnDecl(std::ostream& out, aA_fnDecl fd)
         /* fill code here */
         auto oldRet = funcStatues.find(name)->second.first;
         auto newRet = fd->type;
-        if(!utils_isSameType(oldRet, newRet)){
+        if(!isSameType(oldRet, newRet)){
             Error::FunctionReturnOverload(fd->pos, name, oldRet->pos);
         }
 
@@ -326,7 +326,7 @@ void check_FnDecl(std::ostream& out, aA_fnDecl fd)
                 new_t = newFuncParams[i]->u.declScalar->type;
                 old_t = oldFuncParams[i]->u.declScalar->type;
             }
-            if (utils_isSameType(new_t, old_t)){
+            if (isSameType(new_t, old_t)){
                 
             } else {
                 Error::t_OverrideFunc(fd->pos, *fd->id);
@@ -512,13 +512,13 @@ void check_AssignStmt(std::ostream& out, aA_assignStmt as){
         case A_leftValType::A_varValKind:{
             name = *as->leftVal->u.id;
             /* fill code here */
-            if (!utils_isExist(name)){
+            if (!isExist(name)){
                 Error::UseOfUndeclaredId(as->pos, name);
             }
             
             // right value invariance
             aA_rightVal right = as->rightVal;
-            aA_type rightType = nullptr, leftType = utils_GetTypeFromId(name);
+            aA_type rightType = nullptr, leftType = GetTypeFromId(name);
             check_RightValue(out, right, leftType, ArithExprEnv::CODEBLOCK);
         }
             break;
@@ -526,7 +526,7 @@ void check_AssignStmt(std::ostream& out, aA_assignStmt as){
             name = *as->leftVal->u.arrExpr->arr->u.id;
             /* fill code here */
             check_ArrayExpr(out, as->leftVal->u.arrExpr);
-            aA_type type = utils_GetTypeFromId(name);
+            aA_type type = GetTypeFromId(name);
             aA_rightVal right = as->rightVal;
             check_RightValue(out, right, type, ArithExprEnv::CODEBLOCK);
         }
@@ -550,16 +550,16 @@ void check_ArrayExpr(std::ostream& out, aA_arrayExpr ae){
     // check array name
     /* fill code here */
         // exist
-    if (!utils_isExist(name)){
+    if (!isExist(name)){
         Error::UseOfUndeclaredId(ae->pos, name);
     }
     // array ?
-    if (!utils_isArray(name)){
+    if (!isArray(name)){
         Error::ArraySubscriptValue(ae->pos, name);
     }
     // check index
     /* fill code here */
-    int size = utils_getSizeFromArrayId(name);
+    int size = getSizeFromArrayId(name);
     int index = 0;
     if (ae->idx->kind == A_indexExprKind::A_numIndexKind){
         index = ae->idx->u.num;
@@ -568,12 +568,12 @@ void check_ArrayExpr(std::ostream& out, aA_arrayExpr ae){
         }
     } else {
         string idexId = *ae->idx->u.id;
-        if (!utils_isExist(idexId)){
+        if (!isExist(idexId)){
             Error::UseOfUndeclaredId(ae->idx->pos, idexId);
         }
-        aA_type idexIdType = utils_GetTypeFromId(idexId);
-        if (!utils_isSameType(idexIdType, utils_GetNativeTypeInstance(A_nativeType::A_intTypeKind))){
-            Error::NoViableConversion(ae->idx->pos, utils_GetTypeString(idexIdType), "int");
+        aA_type idexIdType = GetTypeFromId(idexId);
+        if (!isSameType(idexIdType, GetNativeTypeInstance(A_nativeType::A_intTypeKind))){
+            Error::NoViableConversion(ae->idx->pos, GetTypeString(idexIdType), "int");
         }
     }
     return;
@@ -588,18 +588,18 @@ tc_type check_MemberExpr(std::ostream& out, aA_memberExpr me){
     // check struct name
     /* fill code here */
 
-    if (!utils_isExist(name)) {
+    if (!isExist(name)) {
         Error::UseOfUndeclaredId(me->pos, name);
     }
-    if (!utils_isStruct(name)) {
-        Error::StructNotStruct(me->pos, name, utils_GetTypeString(utils_GetTypeFromId(name)));
+    if (!isStruct(name)) {
+        Error::StructNotStruct(me->pos, name, GetTypeString(GetTypeFromId(name)));
     }
     // check member name
     /* fill code here */
     string memberName = *me->memberId;
-    aA_type type = utils_isInStruct(memberName, utils_GetTypeString(utils_GetTypeFromId(name)));
+    aA_type type = isInStruct(memberName, GetTypeString(GetTypeFromId(name)));
     if (!type) {
-        Error::StructNoMember(me->pos, memberName, utils_GetTypeString(utils_GetTypeFromId(name)));
+        Error::StructNoMember(me->pos, memberName, GetTypeString(GetTypeFromId(name)));
     }
     
     return tc_Type(type, 0);
@@ -680,10 +680,10 @@ void check_BoolUnit(std::ostream& out, aA_boolUnit bu, ArithExprEnv env){
             aA_type left_type = check_ExprUnit(out, left, env)->type;
             aA_exprUnit right = bu->u.comExpr->right;
             aA_type right_type = check_ExprUnit(out, right, env)->type;
-            if (!utils_isSameType(left_type, right_type)) {
-                Error::BinaryExpressionInvalidOperand(bu->pos, utils_GetTypeString(left_type), utils_GetTypeString(right_type));
+            if (!isSameType(left_type, right_type)) {
+                Error::BinaryExpressionInvalidOperand(bu->pos, GetTypeString(left_type), GetTypeString(right_type));
             }
-            if (!utils_isSameType(left_type, utils_GetNativeTypeInstance(A_nativeType::A_intTypeKind))){
+            if (!isSameType(left_type, GetNativeTypeInstance(A_nativeType::A_intTypeKind))){
                 Error::t_BoolExprNotAllowed(bu->pos);
             }
         }
@@ -711,14 +711,14 @@ tc_type check_ExprUnit(std::ostream& out, aA_exprUnit eu, ArithExprEnv env){
         case A_exprUnitType::A_idExprKind:{
             /* fill code here */
             const string id = *eu->u.id;
-            if (!utils_isExist(id)) {
+            if (!isExist(id)) {
                 Error::UseOfUndeclaredId(eu->pos, id);
             }
-            if (utils_isArray(id) && env != ArithExprEnv::FUNCTION_CALL) {
+            if (isArray(id) && env != ArithExprEnv::FUNCTION_CALL) {
                 // array id is not allowed
                 Error::t_ArrayIdInArithExpr(eu->pos);
             }
-            return tc_Type(utils_GetTypeFromId(id), 0);
+            return tc_Type(GetTypeFromId(id), 0);
         }
             break;
         case A_exprUnitType::A_numExprKind:{
@@ -733,13 +733,13 @@ tc_type check_ExprUnit(std::ostream& out, aA_exprUnit eu, ArithExprEnv env){
             check_FuncCall(out, eu->u.callExpr);
             // check_FuncCall will check if the function is defined
             /* fill code here */
-            return tc_Type(utils_getReturnTypeByName(*(eu->u.callExpr->fn)), 2);
+            return tc_Type(getReturnTypeByName(*(eu->u.callExpr->fn)), 2);
         }
             break;
         case A_exprUnitType::A_arrayExprKind:{
             check_ArrayExpr(out, eu->u.arrayExpr);
             /* fill code here */
-            return tc_Type(utils_getReturnTypeByName(*(eu->u.arrayExpr->arr->u.id)), 2);
+            return tc_Type(getReturnTypeByName(*(eu->u.arrayExpr->arr->u.id)), 2);
         }
             break;
         case A_exprUnitType::A_memberExprKind:{
@@ -801,7 +801,7 @@ void check_FuncCall(std::ostream& out, aA_fnCall fc){
     }
 
     // type check
-    aA_type rtType = utils_getReturnTypeByName(func_name);
+    aA_type rtType = getReturnTypeByName(func_name);
     // check if parameter list matches
     for(int i = 0; i < fc->vals.size(); i++){
         /* fill code here */
@@ -813,55 +813,55 @@ void check_FuncCall(std::ostream& out, aA_fnCall fc){
             } else {
                 aA_type right_type = check_ArithExpr(out, param_call->u.arithExpr, ArithExprEnv::FUNCTION_CALL)->type;
                 if (param_call->u.arithExpr->kind != A_arithExprType::A_exprUnitKind) {
-                    Error::NoViableConversion(param_call->pos, utils_GetTypeString(right_type), "array");
+                    Error::NoViableConversion(param_call->pos, GetTypeString(right_type), "array");
                 }
                 if (param_call->u.arithExpr->u.exprUnit->kind == A_exprUnitType::A_idExprKind) {
-                    if (!utils_isArray(*param_call->u.arithExpr->u.exprUnit->u.id)){
-                        Error::NoViableConversion(param_call->pos, utils_GetTypeString(right_type), "array");
+                    if (!isArray(*param_call->u.arithExpr->u.exprUnit->u.id)){
+                        Error::NoViableConversion(param_call->pos, GetTypeString(right_type), "array");
                     } else {
-                        if (utils_isSameType(rtType, right_type)) {
+                        if (isSameType(rtType, right_type)) {
                             continue;
                         } else {
-                            Error::NoViableConversion(param_call->pos, utils_GetTypeString(right_type), utils_GetTypeString(rtType));
+                            Error::NoViableConversion(param_call->pos, GetTypeString(right_type), GetTypeString(rtType));
                         }
                     }
                 }
                 if (param_call->u.arithExpr->u.exprUnit->kind == A_exprUnitType::A_memberExprKind) {
                     aA_memberExpr memberExpr = param_call->u.arithExpr->u.exprUnit->u.memberExpr;
-                    if (!utils_isArray(*memberExpr->structId->u.id, *memberExpr->memberId)){
-                        Error::NoViableConversion(param_call->pos, utils_GetTypeString(right_type), "array");
+                    if (!isArray(*memberExpr->structId->u.id, *memberExpr->memberId)){
+                        Error::NoViableConversion(param_call->pos, GetTypeString(right_type), "array");
                     } else {
-                        if (utils_isSameType(rtType, right_type)) {
+                        if (isSameType(rtType, right_type)) {
                             continue;
                         } else {
-                            Error::NoViableConversion(param_call->pos, utils_GetTypeString(right_type), utils_GetTypeString(rtType));
+                            Error::NoViableConversion(param_call->pos, GetTypeString(right_type), GetTypeString(rtType));
                         }
                     }
                 }
                 // others will have scalar
-                Error::NoViableConversion(param_call->pos, utils_GetTypeString(right_type), "array");
+                Error::NoViableConversion(param_call->pos, GetTypeString(right_type), "array");
             }
         } else {
             if (param_call->kind == A_rightValType::A_boolExprValKind) {
-                Error::NoViableConversion(param_call->pos, "bool", utils_GetTypeString(rtType));
+                Error::NoViableConversion(param_call->pos, "bool", GetTypeString(rtType));
             } else {
                 aA_type right_type = check_ArithExpr(out, param_call->u.arithExpr, ArithExprEnv::FUNCTION_CALL)->type;
-                if (!utils_isSameType(rtType, right_type)){
-                    Error::NoViableConversion(param_call->pos, utils_GetTypeString(right_type), utils_GetTypeString(rtType));
+                if (!isSameType(rtType, right_type)){
+                    Error::NoViableConversion(param_call->pos, GetTypeString(right_type), GetTypeString(rtType));
                 }
                 if (param_call->u.arithExpr->u.exprUnit->kind == A_exprUnitType::A_idExprKind) {
-                    if (!utils_isArray(*param_call->u.arithExpr->u.exprUnit->u.id)){
+                    if (!isArray(*param_call->u.arithExpr->u.exprUnit->u.id)){
                         continue;
                     } else {
-                        Error::NoViableConversion(param_call->pos, "array", utils_GetTypeString(right_type));
+                        Error::NoViableConversion(param_call->pos, "array", GetTypeString(right_type));
                     }
                 }
                 if (param_call->u.arithExpr->u.exprUnit->kind == A_exprUnitType::A_memberExprKind) {
                     aA_memberExpr memberExpr = param_call->u.arithExpr->u.exprUnit->u.memberExpr;
-                    if (!utils_isArray(*memberExpr->structId->u.id, *memberExpr->memberId)){
+                    if (!isArray(*memberExpr->structId->u.id, *memberExpr->memberId)){
                         continue;
                     } else {
-                        Error::NoViableConversion(param_call->pos, "array", utils_GetTypeString(right_type));
+                        Error::NoViableConversion(param_call->pos, "array", GetTypeString(right_type));
                     }
                 }
             }
@@ -917,17 +917,17 @@ aA_type check_RightValue(std::ostream& out, aA_rightVal rightVal, aA_type type, 
     aA_type rightValType = nullptr;
     if (rightVal->kind == A_rightValType::A_boolExprValKind){
         // do not support bool value
-        Error::NoViableConversion(rightVal->pos, "bool", utils_GetTypeString(type));
+        Error::NoViableConversion(rightVal->pos, "bool", GetTypeString(type));
     } else {
         // arith expression
         aA_arithExpr arithExpr = rightVal->u.arithExpr;
         rightValType = check_ArithExpr(out, arithExpr, env)->type;
     }
     // RightValue Type Valid
-    if (type && utils_isSameType(type, rightValType)){
+    if (type && isSameType(type, rightValType)){
         return rightValType;
     }else{
-        Error::NoViableConversion(rightVal->pos, utils_GetTypeString(rightValType), utils_GetTypeString(type));
+        Error::NoViableConversion(rightVal->pos, GetTypeString(rightValType), GetTypeString(type));
     }
 }
 

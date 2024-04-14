@@ -9,10 +9,7 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="75fe0ef6-5053-4726-ae5c-384d9ab2622d" name="更改" comment="">
-      <change beforePath="$PROJECT_DIR$/src/lexer.lex" beforeDir="false" afterPath="$PROJECT_DIR$/src/lexer.lex" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/parser.yacc" beforeDir="false" afterPath="$PROJECT_DIR$/src/parser.yacc" afterDir="false" />
-    </list>
+    <list default="true" id="75fe0ef6-5053-4726-ae5c-384d9ab2622d" name="更改" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -32,10 +29,10 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "customColor": "",
-  "associatedIndex": 2
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 2
+}</component>
   <component name="ProjectId" id="2earrtieFslRwYKVl3cDQUmt6fH" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -49,8 +46,8 @@
     "RunOnceActivity.readMode.enableVisualFormatting": "true",
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
-    "git-widget-placeholder": "24s-assignment2",
-    "last_opened_file_path": "F:/Compile/compiler_project",
+    "git-widget-placeholder": "24s-ass2",
+    "last_opened_file_path": "F:/CanNotGraduate/WasmEdge",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -69,6 +66,7 @@
       <option name="presentableId" value="Default" />
       <updated>1712153732498</updated>
       <workItem from="1712153733619" duration="2033000" />
+      <workItem from="1712494059406" duration="649000" />
     </task>
     <servers />
   </component>
