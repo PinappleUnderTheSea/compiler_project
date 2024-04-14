@@ -9,15 +9,15 @@ paramMemberMap struct2Members;
 
 std::unordered_map<string, std::pair<aA_type, Function_Status>> funcStatues;
 
-typeMap runtime_token;
+typeMap current_scope_token;
 
 bool STRICT_DEFINITON = true;
 bool STRICT_FUNCTION_DEFINITON = true;
 aA_type env_return_type;
 
 aA_type GetTypeFromId(string id) {
-    typeMap::const_iterator iter = runtime_token.find(id);
-    if (iter == runtime_token.end()){
+    typeMap::const_iterator iter = current_scope_token.find(id);
+    if (iter == current_scope_token.end()){
         iter = g_token2Type.find(id);
         if (iter == g_token2Type.end()) {
             return nullptr;
@@ -41,8 +41,8 @@ string GetTypeString(aA_type type) {
 }
 
 bool isExist(string id) {
-    typeMap::const_iterator iter = runtime_token.find(id);
-    if (iter == runtime_token.end()){
+    typeMap::const_iterator iter = current_scope_token.find(id);
+    if (iter == current_scope_token.end()){
         iter = g_token2Type.find(id);
         if (iter == g_token2Type.end()) {
             return false;
@@ -53,8 +53,8 @@ bool isExist(string id) {
 }
 
 bool isStruct(string id) {
-    typeMap::const_iterator iter = runtime_token.find(id);
-    if (iter == runtime_token.end()){
+    typeMap::const_iterator iter = current_scope_token.find(id);
+    if (iter == current_scope_token.end()){
         iter = g_token2Type.find(id);
         if (iter == g_token2Type.end()) {
             return false;
@@ -69,8 +69,8 @@ bool isStruct(string id) {
 }
 
 bool isStruct(string id, string name) {
-    typeMap::const_iterator iter = runtime_token.find(id);
-    if (iter == runtime_token.end()){
+    typeMap::const_iterator iter = current_scope_token.find(id);
+    if (iter == current_scope_token.end()){
         iter = g_token2Type.find(id);
         if (iter == g_token2Type.end()) {
             return false;
@@ -84,8 +84,8 @@ bool isStruct(string id, string name) {
 }
 
 bool isArray(string id) {
-    typeMap::const_iterator iter = runtime_token.find(id);
-    if (iter == runtime_token.end()){
+    typeMap::const_iterator iter = current_scope_token.find(id);
+    if (iter == current_scope_token.end()){
         iter = g_token2Type.find(id);
         if (iter == g_token2Type.end()) {
             return false;
@@ -182,8 +182,8 @@ int getSizeFromArrayId(string id){
     if (!isArray(id)){
         return -1;
     }
-    typeMap::const_iterator iter = runtime_token.find(id);
-    if (iter == runtime_token.end()){
+    typeMap::const_iterator iter = current_scope_token.find(id);
+    if (iter == current_scope_token.end()){
         iter = g_token2Type.find(id);
     }
     return iter->second.second.size;
