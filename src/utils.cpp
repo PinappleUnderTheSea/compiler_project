@@ -27,6 +27,15 @@ aA_type GetTypeFromId(string id) {
     return iter->second.first->type;
 }
 
+void SetTypeFromId(string id, aA_type type) {
+    typeMap::const_iterator iter = current_scope_token.find(id);
+    if (iter == current_scope_token.end()){
+        return ;
+    }
+    
+    iter->second.first->type = type;
+}
+
 string GetTypeString(aA_type type) {
     if (!type) return "auto";
     string type_name = "";

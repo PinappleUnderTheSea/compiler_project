@@ -54,14 +54,6 @@ void print_token_map(typeMap* map){
 }
 
 
-void print_token_maps(){
-    std::cout << "global token2Type:" << std::endl;
-    print_token_map(&g_token2Type);
-    std::cout << "local token2Type:" << std::endl;
-    print_token_map(&funcparam_token2Type);
-}
-
-
 bool comp_aA_type(aA_type target, aA_type t){
     if(!target || !t)
         return false;
@@ -517,7 +509,10 @@ void check_AssignStmt(std::ostream& out, aA_assignStmt as){
             // right value invariance
             aA_rightVal right = as->rightVal;
             aA_type rightType = nullptr, leftType = GetTypeFromId(name);
-            check_RightValue(out, right, leftType, ArithExprEnv::CODEBLOCK);
+            rightType = check_RightValue(out, right, leftType, ArithExprEnv::CODEBLOCK);
+            if(!leftType){
+                SetTypeFromId(name, rightType);
+            }
         }
             break;
         case A_leftValType::A_arrValKind:{
@@ -923,6 +918,8 @@ aA_type check_RightValue(std::ostream& out, aA_rightVal rightVal, aA_type type, 
     }
     // RightValue Type Valid
     if (type && isSameType(type, rightValType)){
+        return rightValType;
+    }else if(!type){
         return rightValType;
     }else{
         Error::NoViableConversion(rightVal->pos, GetTypeString(rightValType), GetTypeString(type));

@@ -60,6 +60,7 @@ extern aA_type env_return_type;
 
 
 aA_type GetTypeFromId(string id);
+void SetTypeFromId(string id, aA_type type);
 string GetTypeString(aA_type type);
 bool isExist(string id);
 bool isStruct(string id);

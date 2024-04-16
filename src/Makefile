@@ -11,6 +11,7 @@ run: $(patsubst $(TESTCASE_DIR)/%.tea,$(TESTCASE_DIR)/%.ast,$(TESTCASES))
 
 $(TESTCASE_DIR)/%.ast: $(TESTCASE_DIR)/%.tea compiler
 	@./compiler $< $@
+	@echo "in file $<"
 
 compiler: y.tab.o lex.yy.o TypeCheck.o TeaplAst.o TeaplaAst.o PrintTeaplaAst.o compiler.o utils.o Error.o
 	$(CXX) $(CXXFLAGS) -o compiler $^ 
