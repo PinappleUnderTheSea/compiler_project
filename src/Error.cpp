@@ -32,7 +32,7 @@ void Error::NoViableConversion(A_pos p, string from, string to) {
 
 void Error::UseOfUndeclaredId(A_pos p, string name) {
     char msg[BUFFER_SIZE] = { 0 };
-    snprintf(msg, sizeof(msg)-1, "var %s on line %d, col %d is not defined", name.c_str(), p->line, p->col);
+    snprintf(msg, sizeof(msg)-1, "can not assign to undefined var %s ", name.c_str(), p->line, p->col);
     error_print(&std::cout, p, msg);
 }
 
