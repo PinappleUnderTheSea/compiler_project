@@ -13,7 +13,6 @@ typeMap current_scope_token;
 
 bool STRICT_DEFINITON = true;
 bool STRICT_FUNCTION_DEFINITON = true;
-aA_type env_return_type;
 
 aA_type GetTypeFromId(string id) {
     typeMap::const_iterator iter = current_scope_token.find(id);

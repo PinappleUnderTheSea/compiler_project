@@ -56,7 +56,6 @@ extern std::unordered_map<string, std::pair<aA_type, Function_Status>> funcStatu
 
 extern bool STRICT_DEFINITON;
 extern bool STRICT_FUNCTION_DEFINITON;
-extern aA_type env_return_type;
 
 
 aA_type GetTypeFromId(string id);

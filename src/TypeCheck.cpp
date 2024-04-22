@@ -2,7 +2,6 @@
 #include "Error.h"
 #include "utils.h"
 //global tabels
-//typeMap func2retType; // function name to return type
 
 // global token ids to type
 
@@ -415,7 +414,7 @@ void check_FnDef(std::ostream& out, aA_fnDef fd)
 
     /* fill code here */
     std::vector<string> typenames;
-    env_return_type = fd->fnDecl->type;
+    aA_type fn_return_type = fd->fnDecl->type;
     for (aA_codeBlockStmt stmt : fd->stmts)
     {
         check_CodeblockStmt(out, stmt);
@@ -425,11 +424,11 @@ void check_FnDef(std::ostream& out, aA_fnDef fd)
             string name = varDecl_InsertRunTime(stmt->u.varDeclStmt);
             typenames.push_back(name);
         }
-        if (stmt->u.returnStmt->retVal && !env_return_type){
+        if (stmt->u.returnStmt->retVal && !fn_return_type){
             Error::FunctionVoidReturn(stmt->u.returnStmt->pos);
         }
         if (stmt->kind == A_codeBlockStmtType::A_returnStmtKind){
-            check_RightValue(out, stmt->u.returnStmt->retVal, env_return_type, ArithExprEnv::CODEBLOCK);
+            check_RightValue(out, stmt->u.returnStmt->retVal, fn_return_type, ArithExprEnv::CODEBLOCK);
         }
     }
     for (string name: typenames){
