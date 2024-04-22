@@ -1,5 +1,7 @@
 {
     "files.associations": {
+        "*.rs": "rust",
+        "*.yacc": "bison",
         "iostream": "cpp",
         "array": "cpp",
         "atomic": "cpp",
@@ -39,6 +41,15 @@
         "stdexcept": "cpp",
         "streambuf": "cpp",
         "cinttypes": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "cstring": "cpp",
+        "ctime": "cpp",
+        "chrono": "cpp",
+        "functional": "cpp",
+        "iterator": "cpp",
+        "map": "cpp",
+        "numeric": "cpp",
+        "random": "cpp",
+        "ratio": "cpp"
     }
 }

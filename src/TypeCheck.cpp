@@ -10,11 +10,7 @@
 vector<typeMap*> local_token2Type;
 
 // private util functions
-void error_print(std::ostream& out, A_pos p, string info)
-{
-    out << "Typecheck error in line " << p->line << ", col " << p->col << ": " << info << std::endl;
-    exit(0);
-}
+
 
 
 void print_token_map(typeMap* map){
@@ -240,7 +236,7 @@ void check_StructDef(std::ostream& out, aA_structDef sd)
         return;
     string name = *sd->id;
     if (struct2Members.find(name) != struct2Members.end())
-        error_print(out, sd->pos, "This id is already defined!");
+        error_print(out, sd->pos, "", "This id is already defined!");
     struct2Members[name] = &(sd->varDecls);
     return;
 }
@@ -763,7 +759,7 @@ tc_type check_ArithExpr(std::ostream& out, aA_arithExpr ae, ArithExprEnv env){
             tc_type rightTyep = check_ArithExpr(out, ae->u.arithBiOpExpr->right, env);
             if(ret->type->type > 0 || ret->type->type != A_dataType::A_nativeTypeKind || ret->type->u.nativeType != A_nativeType::A_intTypeKind ||
             rightTyep->type->type > 0 || rightTyep->type->type != A_dataType::A_nativeTypeKind || rightTyep->type->u.nativeType != A_nativeType::A_intTypeKind)
-                error_print(out, ae->pos, "Only int can be arithmetic expression operation values!");
+                error_print(out, ae->pos, "", "Only int can be arithmetic expression operation values!");
         }
             break;
         case A_arithExprType::A_exprUnitKind:

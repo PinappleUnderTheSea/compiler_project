@@ -6,7 +6,7 @@
 #include "TeaplaAst.h"
 #define BUFFER_SIZE 200
 
-void error_print(std::ostream* out, A_pos p, string info);
+void error_print(std::ostream& out, A_pos p, string name, string info);
 class Error{
 public:
     static void Redefinition(A_pos p, string name);
