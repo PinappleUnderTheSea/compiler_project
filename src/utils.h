@@ -32,7 +32,7 @@ typedef enum {
     GLOBAL,
     CODEBLOCK,
     FUNCTION_CALL,
-} ArithExprEnv;
+} ScopeEnv;
 
 struct tc_type_{
     aA_type type;
@@ -46,7 +46,6 @@ typedef std::unordered_map<string, vector<aA_varDecl>*> paramMemberMap;
 extern typeMap g_token2Type; // global token ids to type
 extern typeMap funcparam_token2Type; // func params token ids to type
 extern typeMap current_scope_token;
-// you can use this map to store the members of a struct or params of a function.
 
 extern paramMemberMap func2Param;
 extern paramMemberMap struct2Members;

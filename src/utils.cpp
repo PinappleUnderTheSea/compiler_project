@@ -243,10 +243,6 @@ aA_type check_ArrayExpr(std::ostream* out, aA_arrayExpr ae){
 aA_type check_MemberExpr(std::ostream* out, aA_memberExpr me) {
     if(!me)
         return nullptr;
-    /*
-        Example:
-            a.b
-    */
     string memberId = *me->memberId;
     string structID = *me->structId->u.id;
 

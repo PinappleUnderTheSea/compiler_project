@@ -1,14 +1,10 @@
 #include "TypeCheck.h"
 #include "Error.h"
 #include "utils.h"
-//global tabels
 
-// global token ids to type
-
-// local token ids to type, since func param can override global param
+// local token ids to type, global and current scope type maps are in utils.h
 vector<typeMap*> local_token2Type;
 
-// private util functions
 
 
 
@@ -100,7 +96,7 @@ void check_Prog(std::ostream& out, aA_program p)
     for (auto ele : p->programElements)
     {
         if(ele->kind == A_programVarDeclStmtKind){
-            check_VarDecl(out, ele->u.varDeclStmt, ArithExprEnv::GLOBAL);
+            check_VarDecl(out, ele->u.varDeclStmt, ScopeEnv::GLOBAL);
         }else if (ele->kind == A_programStructDefKind){
             check_StructDef(out, ele->u.structDef);
         }
@@ -129,7 +125,7 @@ void check_Prog(std::ostream& out, aA_program p)
 }
 
 
-void check_VarDecl(std::ostream& out, aA_varDeclStmt vd, ArithExprEnv env)
+void check_VarDecl(std::ostream& out, aA_varDeclStmt vd, ScopeEnv env)
 {
     if (!vd)
         return;
@@ -141,7 +137,7 @@ void check_VarDecl(std::ostream& out, aA_varDeclStmt vd, ArithExprEnv env)
         if(vdecl->kind == A_varDeclType::A_varDeclScalarKind){
             name = *vdecl->u.declScalar->id;
             /* fill code here*/
-            if(env == ArithExprEnv::GLOBAL){
+            if(env == ScopeEnv::GLOBAL){
                 // std::cerr << "global name :" << name << std::endl;
             }
             if (isExist(name)){
@@ -152,7 +148,7 @@ void check_VarDecl(std::ostream& out, aA_varDeclStmt vd, ArithExprEnv env)
             if (type && !TypeValid(type)){
                 Error::UnknowType(type->pos, *type->u.structType);
             }
-            if(env == ArithExprEnv::GLOBAL){
+            if(env == ScopeEnv::GLOBAL){
                 current_scope_token.insert({name, std::pair<tc_type, ValueInfo>(tc_Type(type, 0), ValueInfo(Check_Scalar, 0))});
             }
         }else if (vdecl->kind == A_varDeclType::A_varDeclArrayKind){
@@ -170,7 +166,7 @@ void check_VarDecl(std::ostream& out, aA_varDeclStmt vd, ArithExprEnv env)
             if (type && !TypeValid(type)){
                 Error::UnknowType(type->pos, *type->u.structType);
             }
-            if(env == ArithExprEnv::GLOBAL){
+            if(env == ScopeEnv::GLOBAL){
                 current_scope_token.insert({name, std::pair<tc_type, ValueInfo>(tc_Type(type, 1), ValueInfo(Check_Array, len))});
             }
         }
@@ -192,8 +188,8 @@ void check_VarDecl(std::ostream& out, aA_varDeclStmt vd, ArithExprEnv env)
             }
             // RightValue Invariant
             aA_rightVal rightVal = vd->u.varDef->u.defScalar->val;
-            check_RightValue(out, rightVal, type, ArithExprEnv::GLOBAL);
-            if(env == ArithExprEnv::GLOBAL){
+            check_RightValue(out, rightVal, type, ScopeEnv::GLOBAL);
+            if(env == ScopeEnv::GLOBAL){
                 current_scope_token.insert({name, std::pair<tc_type, ValueInfo>(tc_Type(type, 0), ValueInfo(Check_Scalar, 0))});
             }
 
@@ -219,8 +215,8 @@ void check_VarDecl(std::ostream& out, aA_varDeclStmt vd, ArithExprEnv env)
             if (rightVals.size() > len){
                 Error::ArrayExcessElement(rightVals[len-1]->pos);
             }
-            check_RightValueList(out, rightVals, type, ArithExprEnv::GLOBAL);
-            if(env == ArithExprEnv::GLOBAL){
+            check_RightValueList(out, rightVals, type, ScopeEnv::GLOBAL);
+            if(env == ScopeEnv::GLOBAL){
                 current_scope_token.insert({name, std::pair<tc_type, ValueInfo>(tc_Type(type, 1), ValueInfo(Check_Array, len))});
             }
         }
@@ -428,7 +424,7 @@ void check_FnDef(std::ostream& out, aA_fnDef fd)
             Error::FunctionVoidReturn(stmt->u.returnStmt->pos);
         }
         if (stmt->kind == A_codeBlockStmtType::A_returnStmtKind){
-            check_RightValue(out, stmt->u.returnStmt->retVal, fn_return_type, ArithExprEnv::CODEBLOCK);
+            check_RightValue(out, stmt->u.returnStmt->retVal, fn_return_type, ScopeEnv::CODEBLOCK);
         }
     }
     for (string name: typenames){
@@ -462,7 +458,7 @@ void check_CodeblockStmt(std::ostream& out, aA_codeBlockStmt cs){
     switch (cs->kind)
     {
     case A_codeBlockStmtType::A_varDeclStmtKind:
-        check_VarDecl(out, cs->u.varDeclStmt, ArithExprEnv::CODEBLOCK);
+        check_VarDecl(out, cs->u.varDeclStmt, ScopeEnv::CODEBLOCK);
         break;
     case A_codeBlockStmtType::A_assignStmtKind:
         check_AssignStmt(out, cs->u.assignStmt);
@@ -504,7 +500,7 @@ void check_AssignStmt(std::ostream& out, aA_assignStmt as){
             // right value invariance
             aA_rightVal right = as->rightVal;
             aA_type rightType = nullptr, leftType = GetTypeFromId(name);
-            rightType = check_RightValue(out, right, leftType, ArithExprEnv::CODEBLOCK);
+            rightType = check_RightValue(out, right, leftType, ScopeEnv::CODEBLOCK);
             if(!leftType){
                 SetTypeFromId(name, rightType);
             }
@@ -516,14 +512,14 @@ void check_AssignStmt(std::ostream& out, aA_assignStmt as){
             check_ArrayExpr(out, as->leftVal->u.arrExpr);
             aA_type type = GetTypeFromId(name);
             aA_rightVal right = as->rightVal;
-            check_RightValue(out, right, type, ArithExprEnv::CODEBLOCK);
+            check_RightValue(out, right, type, ScopeEnv::CODEBLOCK);
         }
             break;
         case A_leftValType::A_memberValKind:{
             /* fill code here */
             aA_type type = check_MemberExpr(out, as->leftVal->u.memberExpr)->type;
             aA_rightVal right = as->rightVal;
-            check_RightValue(out, right, type, ArithExprEnv::CODEBLOCK);
+            check_RightValue(out, right, type, ScopeEnv::CODEBLOCK);
         }
             break;
     }
@@ -597,7 +593,7 @@ tc_type check_MemberExpr(std::ostream& out, aA_memberExpr me){
 void check_IfStmt(std::ostream& out, aA_ifStmt is){
     if(!is)
         return;
-    check_BoolExpr(out, is->boolExpr, ArithExprEnv::CODEBLOCK);
+    check_BoolExpr(out, is->boolExpr, ScopeEnv::CODEBLOCK);
     /* fill code here, take care of variable scope */
     std::vector<string> typenames;
     for(aA_codeBlockStmt s : is->ifStmts){
@@ -638,7 +634,7 @@ void check_IfStmt(std::ostream& out, aA_ifStmt is){
 }
 
 
-void check_BoolExpr(std::ostream& out, aA_boolExpr be, ArithExprEnv env){
+void check_BoolExpr(std::ostream& out, aA_boolExpr be, ScopeEnv env){
     if(!be)
         return;
     switch (be->kind)
@@ -657,7 +653,7 @@ void check_BoolExpr(std::ostream& out, aA_boolExpr be, ArithExprEnv env){
 }
 
 
-void check_BoolUnit(std::ostream& out, aA_boolUnit bu, ArithExprEnv env){
+void check_BoolUnit(std::ostream& out, aA_boolUnit bu, ScopeEnv env){
     if(!bu)
         return;
     switch (bu->kind)
@@ -689,7 +685,7 @@ void check_BoolUnit(std::ostream& out, aA_boolUnit bu, ArithExprEnv env){
 }
 
 
-tc_type check_ExprUnit(std::ostream& out, aA_exprUnit eu, ArithExprEnv env){
+tc_type check_ExprUnit(std::ostream& out, aA_exprUnit eu, ScopeEnv env){
     // return the aA_type of expr eu
     if(!eu)
         return nullptr;
@@ -702,7 +698,7 @@ tc_type check_ExprUnit(std::ostream& out, aA_exprUnit eu, ArithExprEnv env){
             if (!isExist(id)) {
                 Error::UseOfUndeclaredId(eu->pos, id);
             }
-            if (isArray(id) && env != ArithExprEnv::FUNCTION_CALL) {
+            if (isArray(id) && env != ScopeEnv::FUNCTION_CALL) {
                 // array id is not allowed
                 Error::t_ArrayIdInArithExpr(eu->pos);
             }
@@ -747,7 +743,7 @@ tc_type check_ExprUnit(std::ostream& out, aA_exprUnit eu, ArithExprEnv env){
 }
 
 
-tc_type check_ArithExpr(std::ostream& out, aA_arithExpr ae, ArithExprEnv env){
+tc_type check_ArithExpr(std::ostream& out, aA_arithExpr ae, ScopeEnv env){
     if(!ae)
         return nullptr;
     tc_type ret;
@@ -799,7 +795,7 @@ void check_FuncCall(std::ostream& out, aA_fnCall fc){
             if (param_call->kind == A_rightValType::A_boolExprValKind) {
                 Error::NoViableConversion(param_call->pos, "bool", "array");
             } else {
-                aA_type right_type = check_ArithExpr(out, param_call->u.arithExpr, ArithExprEnv::FUNCTION_CALL)->type;
+                aA_type right_type = check_ArithExpr(out, param_call->u.arithExpr, ScopeEnv::FUNCTION_CALL)->type;
                 if (param_call->u.arithExpr->kind != A_arithExprType::A_exprUnitKind) {
                     Error::NoViableConversion(param_call->pos, GetTypeString(right_type), "array");
                 }
@@ -833,7 +829,7 @@ void check_FuncCall(std::ostream& out, aA_fnCall fc){
             if (param_call->kind == A_rightValType::A_boolExprValKind) {
                 Error::NoViableConversion(param_call->pos, "bool", GetTypeString(rtType));
             } else {
-                aA_type right_type = check_ArithExpr(out, param_call->u.arithExpr, ArithExprEnv::FUNCTION_CALL)->type;
+                aA_type right_type = check_ArithExpr(out, param_call->u.arithExpr, ScopeEnv::FUNCTION_CALL)->type;
                 if (!isSameType(rtType, right_type)){
                     Error::NoViableConversion(param_call->pos, GetTypeString(right_type), GetTypeString(rtType));
                 }
@@ -862,7 +858,7 @@ void check_FuncCall(std::ostream& out, aA_fnCall fc){
 void check_WhileStmt(std::ostream& out, aA_whileStmt ws){
     if(!ws)
         return;
-    check_BoolExpr(out, ws->boolExpr, ArithExprEnv::CODEBLOCK);
+    check_BoolExpr(out, ws->boolExpr, ScopeEnv::CODEBLOCK);
     /* fill code here, take care of variable scope */
     std::vector<string> typenames;
 
@@ -900,7 +896,7 @@ void check_ReturnStmt(std::ostream& out, aA_returnStmt rs){
     return;
 }
 
-aA_type check_RightValue(std::ostream& out, aA_rightVal rightVal, aA_type type, ArithExprEnv env){
+aA_type check_RightValue(std::ostream& out, aA_rightVal rightVal, aA_type type, ScopeEnv env){
     // RightValue Invariant
     aA_type rightValType = nullptr;
     if (rightVal->kind == A_rightValType::A_boolExprValKind){
@@ -921,7 +917,7 @@ aA_type check_RightValue(std::ostream& out, aA_rightVal rightVal, aA_type type, 
     }
 }
 
-void check_RightValueList(std::ostream& out,std::vector<aA_rightVal> rightVals, aA_type type, ArithExprEnv env){
+void check_RightValueList(std::ostream& out,std::vector<aA_rightVal> rightVals, aA_type type, ScopeEnv env){
     // Type Valid
     for (aA_rightVal rightVal: rightVals) {
         check_RightValue(out, rightVal, type, env);
