@@ -24,9 +24,9 @@ bb2:
 
 bb3:
   %r104 = load i32, i32* %r100
-  %r105 = load i32, i32* %r100
-  %r106 = getelementptr [10 x i32 ], [10 x i32 ]* @a, i32 0, i32 %r105
-  store i32 %r104, i32* %r106
+  %r105 = getelementptr [10 x i32 ], [10 x i32 ]* @a, i32 0, i32 %r104
+  %r106 = load i32, i32* %r100
+  store i32 %r106, i32* %r105
   %r107 = load i32, i32* %r100
   %r108 = add i32 %r107, 1
   store i32 %r108, i32* %r100

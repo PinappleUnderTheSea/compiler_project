@@ -31,6 +31,10 @@ struct Func_local
     Func_local(const std::string _name,LLVMIR::FuncType _ret,const std::vector<Temp_temp*> &_args,const std::list<LLVMIR::L_stm*> &_irs)
         : name(_name), ret(_ret), args(_args), irs(_irs) {}
 };
+AS_operand* getAsOperandFromId(string id, bool isLeftVal = false);
+AS_operand* ast2llvmMemberExpr(aA_memberExpr memberExpr);
+AS_operand* ast2llvmArrayExpr(aA_arrayExpr arrayExpr);
+AS_operand* ast2llvmFnCall(aA_fnCall fnCall);
 
 std::vector<LLVMIR::L_def*> ast2llvmProg_first(aA_program p);
 std::vector<Func_local*> ast2llvmProg_second(aA_program p);
@@ -63,5 +67,10 @@ int ast2llvmArithBiOpExpr_first(aA_arithBiOpExpr a);
 int ast2llvmArithUExpr_first(aA_arithUExpr a);
 int ast2llvmArithExpr_first(aA_arithExpr a);
 int ast2llvmExprUnit_first(aA_exprUnit e);
+
+
+
+
+
 
 #endif

@@ -18,10 +18,10 @@ bb2:
   br i1 %r103, label %bb3, label %bb4
 
 bb3:
-  %r104 = call i32 @getint()
-  %r105 = load i32, i32* %r101
-  %r106 = getelementptr i32, i32* %r100, i32 %r105
-  store i32 %r104, i32* %r106
+  %r104 = load i32, i32* %r101
+  %r105 = getelementptr [10 x i32 ], [10 x i32 ]* %r100, i32 0, i32 %r104
+  %r106 = call i32 @getint()
+  store i32 %r106, i32* %r105
   %r107 = load i32, i32* %r101
   %r108 = add i32 %r107, 1
   store i32 %r108, i32* %r101

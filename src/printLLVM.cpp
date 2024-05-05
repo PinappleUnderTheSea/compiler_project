@@ -698,6 +698,7 @@ void LLVMIR::printL_prog(std::ostream &os,LLVMIR::L_prog *prog)
     {
         printL_def(os,def);
     }
+    cout << "defs done\n";
     for(const auto &func : prog->funcs)
     {
         printL_func(os,func);
@@ -706,6 +707,7 @@ void LLVMIR::printL_prog(std::ostream &os,LLVMIR::L_prog *prog)
 
 void LLVMIR::printL_func(std::ostream &os,LLVMIR::L_func *func)
 {
+    cout << "broken func: "<<func->name<<endl;
     os << "define ";
     switch (func->ret.type)
     {
@@ -766,18 +768,22 @@ void LLVMIR::printL_func(std::ostream &os,LLVMIR::L_func *func)
             break;
         }
     }
+    cout << "args end, block count "<<func->blocks.size()<<endl;
     os << " ) {\n";
     for(const auto &b : func->blocks)
     {
         printL_block(os,b);
     }
+    cout << "block end" << endl;
     os << "}\n\n";
 }
 
 void LLVMIR::printL_block(std::ostream &os,LLVMIR::L_block *block)
 {
+    cout<<"block name: "<<block->instrs.size()<<endl;
     for(const auto &ir : block->instrs)
     {
+        cout << "ir:"<<(int)ir->type<<endl;
         printL_stm(os,ir);
     }
 }
